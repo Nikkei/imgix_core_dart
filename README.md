@@ -1,4 +1,4 @@
-# imgix_flutter
+# imgix_core_dart
 
 Imgix package for flutter.
 
@@ -7,7 +7,7 @@ Imgix package for flutter.
 ## Usage
 
 ```dart
-import 'package:imgix_flutter/imgix_flutter.dart';
+import 'package:imgix_core_dart/imgix_core_dart.dart';
 
 void main() {
   final client = ImgixClient(

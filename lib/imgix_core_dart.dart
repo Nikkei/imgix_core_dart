@@ -1,4 +1,4 @@
-library imgix_flutter;
+library imgix_core_dart;
 
 import 'dart:convert';
 import 'package:crypto/crypto.dart';

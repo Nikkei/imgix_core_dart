@@ -1,14 +1,14 @@
 name: imgix_core_dart
 description: Imgix package for flutter.
 version: 0.0.1
-author:
-homepage:
+homepage: https://sudame.net
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
   crypto: ^2.1.0
+  meta: ^1.1.8
 
 dev_dependencies:
   test: ^1.12.0

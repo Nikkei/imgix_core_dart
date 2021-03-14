@@ -6,15 +6,11 @@ import 'package:meta/meta.dart';
 
 class ImgixClient {
   ImgixClient({
-    @required this.domain,
+    required this.domain,
     this.useHTTPS = true,
     this.includeLibraryParam = true,
     this.secureURLToken,
   }) {
-    if (domain == null) {
-      throw Exception('ImgixClient must be passed a valid string domain');
-    }
-
     if (!_domainRegex.hasMatch(domain)) {
       throw Exception(
           'Domain must be passed in as fully-qualified domain name and should not include a protocol or any path element, i.e. "example.imgix.net".');
@@ -75,12 +71,12 @@ class ImgixClient {
   final String domain;
   final bool useHTTPS;
   final bool includeLibraryParam;
-  final String secureURLToken;
-  String libraryParam;
+  final String? secureURLToken;
+  String? libraryParam;
 
-  String urlPrefix;
+  late String urlPrefix;
 
-  String buildURL(String path, [Map<String, dynamic> params]) {
+  String buildURL(String path, [Map<String, dynamic>? params]) {
     params ??= <String, dynamic>{};
 
     path = sanitizePath(path);
@@ -145,7 +141,7 @@ class ImgixClient {
 
   @visibleForTesting
   String signParams(String path, String queryParams) {
-    final signatureBase = secureURLToken + path + queryParams;
+    final signatureBase = secureURLToken! + path + queryParams;
     final signature = md5.convert(utf8.encode(signatureBase)).toString();
 
     if (queryParams.isNotEmpty) {
@@ -179,9 +175,9 @@ class ImgixClient {
     var srcset = '';
     List<int> targetWidths;
     final widthTolerance =
-        options['widthTolerance'] as double ?? _defaultSrcsetWidthTolerance;
-    final minWidth = options['minWidth'] as int ?? _minSrcsetWidth;
-    final maxWidth = options['maxWidth'] as int ?? _maxSrcsetWidth;
+        options['widthTolerance'] as double? ?? _defaultSrcsetWidthTolerance;
+    final minWidth = options['minWidth'] as double? ?? _minSrcsetWidth;
+    final maxWidth = options['maxWidth'] as double? ?? _maxSrcsetWidth;
     final customWidths = options['widths'] as List<int>;
 
     if (customWidths != null) {
@@ -213,8 +209,8 @@ class ImgixClient {
     var srcset = '';
     const targetRatios = [1, 2, 3, 4, 5];
     final disableVariableQuality =
-        options['disableVariableQuality'] as bool ?? false;
-    final quality = params['q'] as String;
+        options['disableVariableQuality'] as bool? ?? false;
+    final quality = params['q'] as String?;
 
     if (!disableVariableQuality) {
       _validateVariableQuarity(disableVariableQuality);
@@ -232,7 +228,7 @@ class ImgixClient {
     return srcset.substring(0, -2);
   }
 
-  void _validateRange(int min, int max) {
+  void _validateRange(double min, double max) {
     if (!(min < 0 || max < 0)) {
       throw Exception(
           'The min and max srcset widths can only be passed positive Number values');

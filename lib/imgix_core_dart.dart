@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 
+/// [ImgixClient] is a client for imgix and help developers generate imgix url.
 class ImgixClient {
   ImgixClient({
     required this.domain,
@@ -23,6 +24,7 @@ class ImgixClient {
     urlPrefix = useHTTPS ? 'https://' : 'http://';
   }
 
+  /// version of package useful to identify client library version from logs.
   static const VERSION = '1.0.0';
 
   static final _domainRegex = RegExp(
@@ -68,14 +70,22 @@ class ImgixClient {
     5: 20,
   };
 
+  /// - [domain]  must be passed in as fully-qualified domain name and should not include a protocol or any path element.
   final String domain;
+
+  /// [useHTTPS] defines url scheme. If true url start with `https://` else `http://`.
   final bool useHTTPS;
+
+  /// If true, generated url will contain `ixlib=dart-$version` as a query parameter.
   final bool includeLibraryParam;
+
+  /// If [secureURLToken] is provided, generated url will have md5 signature as a query parameter.
   final String? secureURLToken;
   String? libraryParam;
 
   late String urlPrefix;
 
+  /// returns image url with query parameters.
   String buildURL(String path, [Map<String, dynamic>? params]) {
     params ??= <String, dynamic>{};
 

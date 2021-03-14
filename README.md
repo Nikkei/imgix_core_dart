@@ -2,6 +2,8 @@
 
 Imgix package for Dart.
 
+See also https://docs.imgix.com/apis
+
 ## Install
 
 ```pubspec.yaml

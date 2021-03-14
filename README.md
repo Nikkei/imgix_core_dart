@@ -1,9 +1,13 @@
 # imgix_core_dart
 
-Imgix package for flutter.
+Imgix package for Dart.
 
 ## Install
 
+```pubspec.yaml
+dependencies:
+     imgix_core_dart: 1.0.0-nullsafety.0
+```
 ## Usage
 
 ```dart

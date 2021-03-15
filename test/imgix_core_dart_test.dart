@@ -56,7 +56,7 @@ void main() {
       });
 
       test('accepts a single domain name', () {
-        final expectedUrl = 'https://my-host.imgix.net/image.jpg?ixlib=dart-' +
+        const expectedUrl = 'https://my-host.imgix.net/image.jpg?ixlib=dart-' +
             ImgixClient.VERSION;
         final client = ImgixClient(domain: 'my-host.imgix.net');
         expect(client.domain, 'my-host.imgix.net');

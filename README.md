@@ -1,6 +1,6 @@
 # imgix_core_dart
 
-Imgix package for Dart.
+Imgix package for Dart. Imgix is a CDN service with support for realtime image processing and optimization.
 
 See also https://docs.imgix.com/apis
 

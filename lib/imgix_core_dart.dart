@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 
-/// [ImgixClient] is a client for imgix and help developers generate imgix url.
+/// [ImgixClient] is a client for imgix and helps developers generate imgix url.
 class ImgixClient {
   ImgixClient({
     required this.domain,
@@ -73,19 +73,22 @@ class ImgixClient {
   /// - [domain]  must be passed in as fully-qualified domain name and should not include a protocol or any path element.
   final String domain;
 
-  /// [useHTTPS] defines url scheme. If true url start with `https://` else `http://`.
+  /// [useHTTPS] defines url scheme. If true url starts with `https://` else `http://`.
   final bool useHTTPS;
 
-  /// If true, generated url will contain `ixlib=dart-$version` as a query parameter.
+  /// If true, generated url will contain `ixlib=dart-$VERSION` as a query parameter.
   final bool includeLibraryParam;
 
   /// If [secureURLToken] is provided, generated url will have md5 signature as a query parameter.
   final String? secureURLToken;
+
+  /// If [includeLibraryParam] is true, libraryParam is `dart-$VERSION` else null.
   String? libraryParam;
 
+  /// Scheme for generated url. `https://` or `http://`.
   late String urlPrefix;
 
-  /// returns image url with query parameters.
+  /// [buildURL] returns image url string with query parameters.
   String buildURL(String path, [Map<String, dynamic>? params]) {
     params ??= <String, dynamic>{};
 
@@ -150,6 +153,8 @@ class ImgixClient {
   }
 
   @visibleForTesting
+
+  /// [signParams] adds md5 signature to query parameter.
   String signParams(String path, String queryParams) {
     final signatureBase = secureURLToken! + path + queryParams;
     final signature = md5.convert(utf8.encode(signatureBase)).toString();
@@ -188,7 +193,7 @@ class ImgixClient {
         options['widthTolerance'] as double? ?? _defaultSrcsetWidthTolerance;
     final minWidth = options['minWidth'] as double? ?? _minSrcsetWidth;
     final maxWidth = options['maxWidth'] as double? ?? _maxSrcsetWidth;
-    final customWidths = options['widths'] as List<int>;
+    final customWidths = options['widths'] as List<int>?;
 
     if (customWidths != null) {
       _validateWidths(customWidths);
@@ -223,7 +228,7 @@ class ImgixClient {
     final quality = params['q'] as String?;
 
     if (!disableVariableQuality) {
-      _validateVariableQuarity(disableVariableQuality);
+      _validateVariableQuality(disableVariableQuality);
     }
 
     for (final currentRatio in targetRatios) {
@@ -259,7 +264,7 @@ class ImgixClient {
     }
   }
 
-  void _validateVariableQuarity(bool disableVariableQuality) {
+  void _validateVariableQuality(bool disableVariableQuality) {
     throw Exception(
         'The disableVariableQuality argument can only be passed a Boolean value');
   }

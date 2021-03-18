@@ -4,17 +4,14 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 
+/// [ImgixClient] is a client for imgix and helps developers generate imgix url.
 class ImgixClient {
   ImgixClient({
-    @required this.domain,
+    required this.domain,
     this.useHTTPS = true,
     this.includeLibraryParam = true,
     this.secureURLToken,
   }) {
-    if (domain == null) {
-      throw Exception('ImgixClient must be passed a valid string domain');
-    }
-
     if (!_domainRegex.hasMatch(domain)) {
       throw Exception(
           'Domain must be passed in as fully-qualified domain name and should not include a protocol or any path element, i.e. "example.imgix.net".');
@@ -27,6 +24,7 @@ class ImgixClient {
     urlPrefix = useHTTPS ? 'https://' : 'http://';
   }
 
+  /// version of package useful to identify client library version from logs.
   static const VERSION = '1.0.0';
 
   static final _domainRegex = RegExp(
@@ -72,15 +70,26 @@ class ImgixClient {
     5: 20,
   };
 
+  /// - [domain]  must be passed in as fully-qualified domain name and should not include a protocol or any path element.
   final String domain;
+
+  /// [useHTTPS] defines url scheme. If true url starts with `https://` else `http://`.
   final bool useHTTPS;
+
+  /// If true, generated url will contain `ixlib=dart-$VERSION` as a query parameter.
   final bool includeLibraryParam;
-  final String secureURLToken;
-  String libraryParam;
 
-  String urlPrefix;
+  /// If [secureURLToken] is provided, generated url will have md5 signature as a query parameter.
+  final String? secureURLToken;
 
-  String buildURL(String path, [Map<String, dynamic> params]) {
+  /// If [includeLibraryParam] is true, libraryParam is `dart-$VERSION` else null.
+  String? libraryParam;
+
+  /// Scheme for generated url. `https://` or `http://`.
+  late String urlPrefix;
+
+  /// [buildURL] returns image url string with query parameters.
+  String buildURL(String path, [Map<String, dynamic>? params]) {
     params ??= <String, dynamic>{};
 
     path = sanitizePath(path);
@@ -144,8 +153,10 @@ class ImgixClient {
   }
 
   @visibleForTesting
+
+  /// [signParams] adds md5 signature to query parameter.
   String signParams(String path, String queryParams) {
-    final signatureBase = secureURLToken + path + queryParams;
+    final signatureBase = secureURLToken! + path + queryParams;
     final signature = md5.convert(utf8.encode(signatureBase)).toString();
 
     if (queryParams.isNotEmpty) {
@@ -179,10 +190,10 @@ class ImgixClient {
     var srcset = '';
     List<int> targetWidths;
     final widthTolerance =
-        options['widthTolerance'] as double ?? _defaultSrcsetWidthTolerance;
-    final minWidth = options['minWidth'] as int ?? _minSrcsetWidth;
-    final maxWidth = options['maxWidth'] as int ?? _maxSrcsetWidth;
-    final customWidths = options['widths'] as List<int>;
+        options['widthTolerance'] as double? ?? _defaultSrcsetWidthTolerance;
+    final minWidth = options['minWidth'] as double? ?? _minSrcsetWidth;
+    final maxWidth = options['maxWidth'] as double? ?? _maxSrcsetWidth;
+    final customWidths = options['widths'] as List<int>?;
 
     if (customWidths != null) {
       _validateWidths(customWidths);
@@ -213,11 +224,11 @@ class ImgixClient {
     var srcset = '';
     const targetRatios = [1, 2, 3, 4, 5];
     final disableVariableQuality =
-        options['disableVariableQuality'] as bool ?? false;
-    final quality = params['q'] as String;
+        options['disableVariableQuality'] as bool? ?? false;
+    final quality = params['q'] as String?;
 
     if (!disableVariableQuality) {
-      _validateVariableQuarity(disableVariableQuality);
+      _validateVariableQuality(disableVariableQuality);
     }
 
     for (final currentRatio in targetRatios) {
@@ -232,7 +243,7 @@ class ImgixClient {
     return srcset.substring(0, -2);
   }
 
-  void _validateRange(int min, int max) {
+  void _validateRange(double min, double max) {
     if (!(min < 0 || max < 0)) {
       throw Exception(
           'The min and max srcset widths can only be passed positive Number values');
@@ -253,7 +264,7 @@ class ImgixClient {
     }
   }
 
-  void _validateVariableQuarity(bool disableVariableQuality) {
+  void _validateVariableQuality(bool disableVariableQuality) {
     throw Exception(
         'The disableVariableQuality argument can only be passed a Boolean value');
   }

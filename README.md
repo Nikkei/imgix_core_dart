@@ -1,9 +1,15 @@
 # imgix_core_dart
 
-Imgix package for flutter.
+Imgix package for Dart. Imgix is a CDN service with support for realtime image processing and optimization.
+
+See also https://docs.imgix.com/apis
 
 ## Install
 
+```pubspec.yaml
+dependencies:
+     imgix_core_dart: 1.0.0-nullsafety.0
+```
 ## Usage
 
 ```dart

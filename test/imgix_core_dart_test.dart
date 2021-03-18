@@ -56,20 +56,16 @@ void main() {
       });
 
       test('accepts a single domain name', () {
-        final expectedUrl = 'https://my-host.imgix.net/image.jpg?ixlib=dart-' +
+        const expectedUrl = 'https://my-host.imgix.net/image.jpg?ixlib=dart-' +
             ImgixClient.VERSION;
         final client = ImgixClient(domain: 'my-host.imgix.net');
         expect(client.domain, 'my-host.imgix.net');
         expect(client.buildURL('image.jpg'), expectedUrl);
       });
-
-      test('errors when no domain is passed', () {
-        expect(() => ImgixClient(domain: null), throwsException); // ignore:
-      });
     });
 
     group('Calling _sanitizePath()', () {
-      ImgixClient client;
+      late ImgixClient client;
 
       setUpAll(() {
         client = ImgixClient(domain: 'testing.imgix.net');
@@ -215,7 +211,7 @@ void main() {
     });
 
     group('Calling _buildParams()', () {
-      ImgixClient client;
+      late ImgixClient client;
 
       setUp(() {
         client = ImgixClient(
@@ -288,7 +284,7 @@ void main() {
     });
 
     group('Calling signParams()', () {
-      ImgixClient client;
+      late ImgixClient client;
       const path = 'images/1.png';
 
       setUp(() {
@@ -307,17 +303,16 @@ void main() {
         expect(result, expectation);
       });
 
-
       test(
           'returns a query string with a proper signature parameter appended, if other query parameters are provided',
-              () {
-            const expectation = '?w=400&s=990916ef8cc640c58d909833e47f6c31';
-            final result = client.signParams(path, '?w=400');
-            expect(result, expectation);
-          });
+          () {
+        const expectation = '?w=400&s=990916ef8cc640c58d909833e47f6c31';
+        final result = client.signParams(path, '?w=400');
+        expect(result, expectation);
+      });
     });
 
-    group('Calling buildSrcSet()', (){
+    group('Calling buildSrcSet()', () {
       // TODO: write a test!!
     });
   });

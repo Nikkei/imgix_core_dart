@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [1.0.0-nullsafety.0] -2021-03-xx
+## [1.0.0-nullsafety.0] -2021-06-xx
 ### features
 - migrate to null safety version
 

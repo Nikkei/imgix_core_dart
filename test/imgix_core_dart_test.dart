@@ -190,7 +190,7 @@ void main() {
       });
 
       group('with a full HTTPS URL that contains encoded characters', () {
-        const path = 'http://example.com/images/1.png?foo=%20';
+        const path = 'https://example.com/images/1.png?foo=%20';
 
         test('prepends a leading slash, unencoded', () {
           final result = client.sanitizePath(path);
@@ -310,10 +310,6 @@ void main() {
         final result = client.signParams(path, '?w=400');
         expect(result, expectation);
       });
-    });
-
-    group('Calling buildSrcSet()', () {
-      // TODO: write a test!!
     });
   });
 }

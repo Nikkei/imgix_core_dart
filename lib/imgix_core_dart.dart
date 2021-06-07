@@ -1,6 +1,7 @@
 library imgix_core_dart;
-
 import 'dart:convert';
+
+import 'package:imgix_core_dart/encoding.dart';
 import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 
@@ -89,6 +90,7 @@ class ImgixClient {
   late String urlPrefix;
 
   /// [buildURL] returns image url string with query parameters.
+  /// About the parameters, see https://docs.imgix.com/apis/rendering
   String buildURL(String path, [Map<String, dynamic>? params]) {
     params ??= <String, dynamic>{};
 
@@ -124,14 +126,14 @@ class ImgixClient {
       params['ixlib'] = libraryParam;
     }
 
-    final queryParams = <dynamic>[];
+    final queryParams = <String>[];
 
     for (final key in params.keys) {
       final dynamic val = params[key];
       final encodedKey = Uri.encodeComponent(key);
       String encodedVal;
 
-      if (key.contains('64') && key.substring(key.length - 2) == '64') {
+      if (key.isBase64) {
         encodedVal = base64UrlEncode(utf8.encode(val));
 
         // see: https://docs.imgix.com/apis/url
@@ -184,7 +186,7 @@ class ImgixClient {
 
   String _buildSrcSetPairs(
     String path, [
-    Map<String, dynamic> params = const <String, dynamic>{},
+    Map<String, String> params = const <String, String>{},
     Map<String, dynamic> options = const <String, dynamic>{},
   ]) {
     var srcset = '';

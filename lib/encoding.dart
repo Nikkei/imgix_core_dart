@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+
 /// [ImgixStringOpts] provides simplified syntax for checking and converting string.
 extension ImgixStringOpts on String {
   /// [isBase64] checks if the paramKey is suffixed by "64," indicating
@@ -35,7 +36,7 @@ extension ImgixStringOpts on String {
       return s;
     }
     final result = <String>[];
-     s.split('/').forEach((component) {
+    s.split('/').forEach((component) {
       final escaped = Uri.encodeComponent(component).replaceAll('+', '%2B');
       result.add(escaped);
     });
@@ -43,6 +44,7 @@ extension ImgixStringOpts on String {
   }
 }
 
+/// [createSignature] creates __MD5__ signature from token,path and query parameters.
 String createSignature(String token, String path, String query) {
   final delimiter = query.isNotEmpty ? '?' : '';
   final sb = StringBuffer()..writeAll(<String>[token, path, delimiter, query]);

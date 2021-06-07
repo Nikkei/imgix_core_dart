@@ -1,25 +1,37 @@
+import 'package:imgix_core_dart/encoding.dart';
 import 'package:meta/meta.dart';
 import 'package:imgix_core_dart/constants.dart' as constants;
+import 'package:imgix_core_dart/validators.dart' as validators;
 
 class ImgixURL {
   ImgixURL(String path, this.domain,
       {this.params, bool useHttps = true, this.includeLibParam = false})
       : _useHttps = useHttps,
-        sanitizedPath = sanitizePath(path) {
-    final isValidDomain =
-        RegExp(constants.DOMAIN_REGEX, caseSensitive: false, multiLine: false)
-            .hasMatch(domain);
+        sanitizedPath = path.sanitizedPath {
+    final isValidDomain = validators.validateDomain(domain);
     if (!isValidDomain) {
       throw const FormatException(
           'Domain must be passed in as fully-qualified domain name and should not include a protocol or any path element, i.e. "example.imgix.net".');
     }
-    if (includeLibParam) {
-      params = {
-        if (params != null) ...params!,
-        'ixlib': 'dart-${constants.IMGIX_LIB_VERSION}'
-      };
-    }
+    params = {
+      if (params != null) ...params!,
+      if (includeLibParam) ...constants.metaParams
+    };
   }
+
+  factory ImgixURL.http(String path, String domain,
+          {Map<String, String>? params, bool? includeLibParam}) =>
+      ImgixURL(path, domain,
+          useHttps: false,
+          includeLibParam: includeLibParam ?? false,
+          params: params);
+
+  factory ImgixURL.https(String path, String domain,
+          {Map<String, String>? params, bool? includeLibParam}) =>
+      ImgixURL(path, domain,
+          useHttps: true,
+          includeLibParam: includeLibParam ?? false,
+          params: params);
 
   factory ImgixURL.withLibParam(String path, String domain,
           {Map<String, String>? params, bool useHttps = true}) =>
@@ -35,7 +47,7 @@ class ImgixURL {
 
   @override
   String toString() {
-    return '';
+    return 'wip';
   }
 
   ImgixURL copyWith(
@@ -50,23 +62,25 @@ class ImgixURL {
         useHttps: useHttps ?? _useHttps);
   }
 
-  Uri get asUri => Uri(scheme: scheme, host: domain, path: sanitizedPath);
+  Uri get asUri => Uri(
+      scheme: scheme,
+      host: domain,
+      path: sanitizedPath,
+      queryParameters: params);
 
   String get scheme => _useHttps ? 'https' : 'http';
 
   @visibleForTesting
-  static String sanitizePath(String path) {
-    path = path.replaceFirst(RegExp(r'^\/'), '');
+  String buildParams(Map<String, String> params) {
+    final queryParams = <String>[];
 
-    if (RegExp(r'^https?:\/\/').hasMatch(path)) {
-      path = Uri.encodeComponent(path);
-    } else {
-      path = Uri.encodeFull(path)
-          .replaceAll('#', '%23')
-          .replaceAll('?', '%3F')
-          .replaceAll(':', '%3A');
+    for (final key in params.keys) {
+      final val = params[key]!;
+      final encodedKey = key.inUriEncodeComponent;
+      final encodedVal =
+          key.isBase64 ? val.inBase64Encoding : val.inUriEncodeComponent;
+      queryParams.add('$encodedKey=$encodedVal');
     }
-
-    return '/' + path;
+    return queryParams.join('&');
   }
 }

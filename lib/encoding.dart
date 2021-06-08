@@ -46,7 +46,7 @@ extension ImgixStringOpts on String {
 
 /// [createSignature] creates __MD5__ signature from token,path and query parameters.
 String createSignature(String token, String path, String query) {
-  final delimiter = query.isNotEmpty ? '?' : '';
+  final delimiter = query.isEmpty ? '':'?' ;
   final sb = StringBuffer()..writeAll(<String>[token, path, delimiter, query]);
   final signatureBase = sb.toString();
   final signature = md5.convert(utf8.encode(signatureBase)).toString();

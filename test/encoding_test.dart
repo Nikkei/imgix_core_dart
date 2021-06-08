@@ -31,5 +31,16 @@ void main(){
         expect('Hello,+World!'.inBase64Encoding,'SGVsbG8sK1dvcmxkIQ');
       });
     });
+    group('signature',(){
+      // note: https://github.com/imgix/imgix-blueprint#simple-paths
+      test('generates correct signature',(){
+        final s = createSignature('FOO123bar','/users/1.png','');
+        expect(s,'6797c24146142d5b40bde3141fd3600c');
+      });
+      test('generates correct signature',(){
+        final s = createSignature('FOO123bar','/users/1.png','w=400&h=300');
+        expect(s,'c7b86f666a832434dd38577e38cf86d1');
+      });
+    });
   });
 }

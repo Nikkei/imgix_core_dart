@@ -159,6 +159,7 @@ class ImgixClient {
   /// [signParams] adds md5 signature to query parameter.
   String signParams(String path, String queryParams) {
     final signatureBase = secureURLToken! + path + queryParams;
+    print(signatureBase);
     final signature = md5.convert(utf8.encode(signatureBase)).toString();
 
     if (queryParams.isNotEmpty) {

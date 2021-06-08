@@ -12,5 +12,5 @@ bool isValidWidthTolerance(double widthTolerance) {
 }
 
 bool isValidWidths(List<int>? customWidths) {
-  return customWidths?.isNotEmpty ?? true;
+  return customWidths != null && customWidths.isNotEmpty && !customWidths.any((e)=>e<0);
 }

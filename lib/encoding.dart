@@ -24,11 +24,13 @@ extension ImgixStringOpts on String {
   String get inBase64Encoding => base64UrlEncode(utf8.encode(this)).unpad;
 
   /// [inUriEncodedComponent] converts String into safe uri path component
-  String get inUriEncodeComponent => Uri.encodeComponent(toString());
+  String get inUriEncodeComponent => Uri.encodeComponent(this);
 
-  String get sanitizedPath => startsWith('/')
-      ? '/' + _splitAndEscape(substring(1))
-      : '/' + _splitAndEscape(this);
+  String get sanitizedPath => isEmpty
+      ? ''
+      : startsWith('/')
+          ? '/' + _splitAndEscape(substring(1))
+          : '/' + _splitAndEscape(this);
 
   ///  [_splitAndEscape] splits the path on forward slash characters.
   String _splitAndEscape(String s) {
@@ -37,7 +39,7 @@ extension ImgixStringOpts on String {
     }
     final result = <String>[];
     s.split('/').forEach((component) {
-      final escaped = Uri.encodeComponent(component).replaceAll('+', '%2B');
+      final escaped = component.inUriEncodeComponent.replaceAll('+', '%2B');
       result.add(escaped);
     });
     return result.join('/');
@@ -46,7 +48,7 @@ extension ImgixStringOpts on String {
 
 /// [createSignature] creates __MD5__ signature from token,path and query parameters.
 String createSignature(String token, String path, String query) {
-  final delimiter = query.isEmpty ? '':'?' ;
+  final delimiter = query.isEmpty ? '' : '?';
   final sb = StringBuffer()..writeAll(<String>[token, path, delimiter, query]);
   final signatureBase = sb.toString();
   final signature = md5.convert(utf8.encode(signatureBase)).toString();

@@ -25,8 +25,10 @@ class ImgixURLBuilder {
         _signKey = defaultSignKey,
         _shouldIncludeLibParamByDefault = includeLibParam {
     final isValidDomain = validators.validateDomain(_domain);
-    assert(isValidDomain,
-        'Domain must not be empty and must be passed in as fully-qualified domain name and should not include a protocol or any path element, i.e. "example.imgix.net".');
+    if (!isValidDomain) {
+      throw const FormatException(
+          'Domain must not be empty and must be passed in as fully-qualified domain name and should not include a protocol or any path element, i.e. "example.imgix.net".');
+    }
   }
 
   /// A source's domain, i.e. example.imgix.net
@@ -97,7 +99,7 @@ class ImgixURLBuilder {
     if (_signKey?.isNotEmpty ?? false) {
       queryParams = withSignature(path, queryParams, _signKey!);
     }
-    final delimiter = params.isEmpty ? '' : '?';
+    final delimiter = queryParams.isEmpty ? '' : '?';
     if (useHttps == null) {
       return _urlPrefix() + _domain + path + delimiter + queryParams;
     } else {

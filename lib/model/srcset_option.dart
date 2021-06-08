@@ -12,7 +12,7 @@ class SrcsetOption {
           'The min and max srcset widths can only be passed positive Number values');
     }
     if (!isValidWidthTolerance(tolerance)) {
-      throw Exception(
+      throw const FormatException(
           'The srcset widthTolerance argument can only be passed a positive scalar number');
     }
   }
@@ -28,15 +28,18 @@ class SrcsetOption {
   /// [maxWidth] value––with a defaultTolerance amount of tolerable image
   /// width-variance between them.
   List<int> generateTargetWidths() {
+    if (_isNotCustom()) {
+      return constants.DEFAULT_WIDTHS.toList();
+    }
     final resolutions = <int>[];
     final incrementPercentage = tolerance;
-    var prev = minWidth as double;
+    var prev = minWidth.toDouble();
 
     int ensureEven(double n) {
-      return 2 * (n / 2).floor();
+      return 2 * (n / 2).round();
     }
 
-    while (prev < (maxWidth as double)) {
+    while (prev < (maxWidth.toDouble())) {
       resolutions.add(ensureEven(prev));
       prev *= 1 + (incrementPercentage * 2);
     }
@@ -53,4 +56,10 @@ class SrcsetOption {
   final int minWidth, maxWidth;
   final double tolerance;
   final bool enableVariableQuality;
+
+  bool _isNotCustom() {
+    return minWidth == constants.DEFAULT_MIN_WIDTH &&
+        maxWidth == constants.DEFAULT_MAX_WIDTH &&
+        tolerance == constants.SRCSET_DEFAULT_TOLERANCE;
+  }
 }

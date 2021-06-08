@@ -17,6 +17,32 @@ class SrcsetOption {
     }
   }
 
+  const SrcsetOption.base()
+      : maxWidth = constants.DEFAULT_MAX_WIDTH,
+        minWidth = constants.DEFAULT_MIN_WIDTH,
+        tolerance = constants.SRCSET_DEFAULT_TOLERANCE,
+        enableVariableQuality = true;
+
+  /// [generateTargetWidths] creates an array of integer image widths.
+  /// The image widths begin at the [minWidth] value and end at the
+  /// [maxWidth] value––with a defaultTolerance amount of tolerable image
+  /// width-variance between them.
+  List<int> generateTargetWidths() {
+    final resolutions = <int>[];
+    final incrementPercentage = tolerance;
+    var prev = minWidth as double;
+
+    int ensureEven(double n) {
+      return 2 * (n / 2).floor();
+    }
+
+    while (prev < (maxWidth as double)) {
+      resolutions.add(ensureEven(prev));
+      prev *= 1 + (incrementPercentage * 2);
+    }
+    return resolutions;
+  }
+
   Map<String, dynamic> toMap() => <String, dynamic>{
         'minWidth': minWidth,
         'maxWidth': maxWidth,

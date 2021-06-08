@@ -109,22 +109,19 @@ class ImgixURLBuilder {
   // todo: add test
   String buildSrcset(String path,
       {Map<String, String> params = const <String, String>{},
-      SrcsetOption? options}) {
+      SrcsetOption options = const SrcsetOption.base()}) {
     if (_shouldBuildDPRBasedSrcset(params)) {
       return _buildSrcsetList(buildDPRBasedSrcsetEntries(path, params: params),
           suffixBuilder: (e) => '${e.key}x').join('\n');
     }
-    final targets = _generateTargetWidths(
-        options?.tolerance ?? constants.SRCSET_DEFAULT_TOLERANCE,
-        options?.minWidth ?? constants.DEFAULT_MIN_WIDTH,
-        options?.maxWidth ?? constants.DEFAULT_MAX_WIDTH);
+    final targets = options.generateTargetWidths();
     return _buildSrcsetList(
             buildSrcsetEntries(path, params: params, targets: targets))
         .join('\n');
   }
 
   // todo: add test
-  String createSrcFromWidths(String path,
+  String createSrcsetFromWidths(String path,
       {Map<String, String> params = const <String, String>{},
       required List<int> widths}) {
     final entries = buildSrcsetEntries(path, params: params, targets: widths);
@@ -220,6 +217,7 @@ class ImgixURLBuilder {
   }
 
   @visibleForTesting
+
   /// [withSignature] adds md5 signature to query parameter.
   String withSignature(String path, String queryParams, String signKey) {
     final signature = createSignature(signKey, path, queryParams);
@@ -242,30 +240,5 @@ class ImgixURLBuilder {
         'q': constants.DPR_QUALITIES[dprRatio].toString()
       }
     };
-  }
-
-  /// [_generateTargetWidths] creates an array of integer image widths.
-  /// The image widths begin at the [minWidth] value and end at the
-  /// [maxWidth] value––with a defaultTolerance amount of tolerable image
-  /// width-variance between them.
-  List<int> _generateTargetWidths(
-    double widthTolerance,
-    int minWidth,
-    int maxWidth,
-  ) {
-    final resolutions = <int>[];
-    final incrementPercentage = widthTolerance;
-    var prev = minWidth as double;
-
-    int ensureEven(double n) {
-      return 2 * (n / 2).floor();
-    }
-
-    while (prev < (maxWidth as double)) {
-      resolutions.add(ensureEven(prev));
-      prev *= 1 + (incrementPercentage * 2);
-    }
-
-    return resolutions;
   }
 }

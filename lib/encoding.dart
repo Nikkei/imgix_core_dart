@@ -7,6 +7,20 @@ extension ImgixStringOpts on String {
   /// that the value is intended to be base64-URL-encoded.
   bool get isBase64 => endsWith('64');
 
+  bool get isAsciiHTTPProxy => startsWith('http://') || startsWith('https://');
+
+  bool get isEncodedHTTPProxy =>
+      // encoded http
+      startsWith('http%3A%2F%2F') ||
+      // encoded https
+      startsWith('https%3A%2F%2F') ||
+      // encoded http in lowercase
+      startsWith('http%3a%2f%2f') ||
+      // encoded https in lowercase
+      startsWith('https%3a%2f%2f');
+
+  String encodeProxy() => inUriEncodeComponent.replaceAll(':', '%3A');
+
   /// [hasBase64Padding] checks if the paramKey is suffixed by "=.
   ///
   /// In base64, '=' are added to the end of the encoding as padding.
@@ -29,8 +43,18 @@ extension ImgixStringOpts on String {
   String get sanitizedPath => isEmpty
       ? ''
       : startsWith('/')
-          ? '/' + _splitAndEscape(substring(1))
-          : '/' + _splitAndEscape(this);
+          ? '/' + _map(substring(1))
+          : '/' + _map(this);
+
+  String _map(String path) {
+    if (path.isAsciiHTTPProxy) {
+      return path.encodeProxy();
+    }
+    if (path.isEncodedHTTPProxy) {
+      return path;
+    }
+    return _splitAndEscape(path);
+  }
 
   ///  [_splitAndEscape] splits the path on forward slash characters.
   String _splitAndEscape(String s) {
@@ -54,5 +78,3 @@ String createSignature(String token, String path, String query) {
   final signature = md5.convert(utf8.encode(signatureBase)).toString();
   return signature;
 }
-
-// todo: add proxy functionality

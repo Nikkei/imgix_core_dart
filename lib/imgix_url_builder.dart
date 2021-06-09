@@ -109,7 +109,6 @@ class ImgixURLBuilder {
     }
   }
 
-  // todo: add test
   String buildSrcset(String path,
       {Map<String, String> params = const <String, String>{},
       SrcsetOption options = const SrcsetOption.base()}) {

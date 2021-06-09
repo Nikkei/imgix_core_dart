@@ -7,15 +7,15 @@ import 'package:imgix_core_dart/model/srcset_option.dart';
 import 'package:imgix_core_dart/validators.dart' as validators;
 import 'package:meta/meta.dart';
 
-/// [ImgixURLBuilder] facilitates the building of imgix URLs.
+/// [URLBuilder] facilitates the building of imgix URLs.
 ///
 /// params
 /// - [domain] : Domain of urls to be generated.
 /// - [shouldUseHttpsByDefault] : If true,generated urls start with "https" prefix. Otherwise, "http".
 /// - [defaultSignKey] : Key to sign generated url.
 /// - [includeLibParam] : If true, generated Urls contain libParam. LibParam is "dart-$[IMGIX_LIB_VERSION]"
-class ImgixURLBuilder {
-  ImgixURLBuilder(
+class URLBuilder {
+  URLBuilder(
       {required String domain,
       bool shouldUseHttpsByDefault = true,
       String? defaultSignKey,

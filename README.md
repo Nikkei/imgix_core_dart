@@ -18,18 +18,17 @@ dependencies:
 import 'package:imgix_core_dart/imgix_core_dart.dart';
 
 void main() {
-  final urlBuilder = ImgixURLBuilder(
+  final client = URLBuilder(
     domain: 'testing.imgix.net',
-    useHTTPS: true,
-    secureURLToken: '<SECURE TOKEN>',
+    shouldUseHttpsByDefault: true,
+    defaultSignKey: '<SECURE TOKEN>',
   );
 
-  final url = urlBuilder.buildURL(
+  final url = client.createURLString(
     '/path/to/image.png',
-    <String, dynamic>{'w': 400, 'h': 300},
+    params: {'w': '400', 'h': '300'},
   );
-  print(url);
-  // -> http://testing.imgix.net/path/to/image.png?ixlib=dart-1.0.0&s=d989ab7de53535886b09183a43f801aa
+  print(url); // => https://testing.imgix.net/path/to/image.png?w=400&h=300&s=11c92d85ea7e2d7ddfb98e5aac179964
 }
 ```
 
@@ -57,3 +56,5 @@ final srcset = urlBuilder.createSrcset('example.png');
 ```shell script
 pub test
 ```
+
+## Contributing

@@ -1,4 +1,4 @@
-import 'package:imgix_core_dart/imgix_url_builder.dart';
+import 'package:imgix_core_dart/url_builder.dart';
 import 'package:imgix_core_dart/model/srcset_option.dart';
 import 'package:test/test.dart';
 import 'package:imgix_core_dart/constants.dart' as constants;
@@ -9,39 +9,61 @@ void main() {
       test('does not accept invalid domain', () {
         const hostWithLeadingSlash = '/my-host.imgix.net';
         const hostWithTrailingSlash = 'my-host.imgix.net/';
-        expect(() => ImgixURLBuilder(domain: hostWithLeadingSlash),
+        const hostWithScheme = 'https://my-host.imgix.net';
+        expect(() => URLBuilder(domain: hostWithLeadingSlash),
             throwsFormatException,
-            reason: 'domain must not contains any leading characters');
-        expect(() => ImgixURLBuilder(domain: hostWithTrailingSlash),
+            reason: 'domain must not contains any leading slash');
+        expect(() => URLBuilder(domain: hostWithTrailingSlash),
             throwsFormatException,
-            reason: 'domain must not contains any trailing characters');
+            reason: 'domain must not contains any trailing slash');
+        expect(() => URLBuilder(domain: hostWithScheme), throwsFormatException,
+            reason: 'domain must not contains any scheme');
       });
     });
     group('by default', () {
       test('generates https url', () {
         const host = 'my-host.imgix.net';
-        final b = ImgixURLBuilder(domain: host);
-        expect(b.createURLString('/path').startsWith('https'), true);
+        final b = URLBuilder(domain: host);
+        expect(b.createURLString('/path').startsWith('https://'), true);
       });
       test('generated urls do not have any query parameters', () {
         const host = 'my-host.imgix.net';
-        final b = ImgixURLBuilder(domain: host);
+        final b = URLBuilder(domain: host);
         expect(b.createURLString('/path').endsWith('/path'), true);
+      });
+    });
+    group('if specified', () {
+      test('generates http url', () {
+        const host = 'my-host.imgix.net';
+        final b = URLBuilder(domain: host, shouldUseHttpsByDefault: false);
+        expect(b.createURLString('/path').startsWith('http://'), true);
+      });
+      test('generates url with lib param', () {
+        const host = 'my-host.imgix.net';
+        final b = URLBuilder(domain: host, includeLibParam: true);
+        expect(
+            b
+                .createURLString('/path')
+                .contains('ixlib=dart-${constants.IMGIX_LIB_VERSION}'),
+            true);
       });
     });
     group('.createUrlString(<valid path)', () {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
         const path = 'foo/bar/buzz';
-        final builder = ImgixURLBuilder(domain: host);
+        const pathWithSlash = '/' + path;
+        final builder = URLBuilder(domain: host);
         expect(builder.createPlainURLString(path), 'https://$host/$path');
+        expect(builder.createPlainURLString(path),
+            builder.createPlainURLString(pathWithSlash));
       });
     });
     group('.createUrlString(<path starts with /)', () {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         expect(builder.createPlainURLString(path), 'https://$host$path');
       });
     });
@@ -51,7 +73,7 @@ void main() {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
         const path = '#foo/:bar/?buzz/';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         final result = builder.createPlainURLString(path);
         expect(result.contains('#'), false);
         expect(result.contains('?'), false);
@@ -62,7 +84,7 @@ void main() {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
         const path = '#/:/?/';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         final result = builder.createPlainURLString(path);
         expect(result.contains('#'), false);
         expect(result.contains('?'), false);
@@ -73,17 +95,35 @@ void main() {
       test('returns an Uri instance', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
-        final builder = ImgixURLBuilder(domain: host, includeLibParam: true);
+        final builder = URLBuilder(domain: host, includeLibParam: true);
         expect(builder.createPlainURLString(path),
             'https://$host$path?ixlib=dart-${constants.IMGIX_LIB_VERSION}');
+      });
+    });
+    group('.createUrlString(<valid path) with plain params', () {
+      test('returns an Uri instance', () {
+        const host = 'my-host.imgix.net';
+        const path = '/foo/bar/buzz';
+        final builder = URLBuilder(domain: host);
+        expect(
+            builder.createURLString(path, params: {'h': '300', 'w\$': '\$400'}),
+            'https://$host$path?h=300&w%24=%24400');
+      });
+    });
+    group('.createUrlString(<valid path) with base64 params', () {
+      test('returns an Uri instance', () {
+        const host = 'my-host.imgix.net';
+        const path = '/foo/bar/buzz';
+        final builder = URLBuilder(domain: host);
+        expect(builder.createURLString(path, params: {'txt64': 'lorem ipsum'}),
+            'https://$host$path?txt64=bG9yZW0gaXBzdW0');
       });
     });
     group('.createUrlString(<valid path) with signKey', () {
       test('returns an Uri instance', () {
         const host = 'my-social-network.imgix.net';
         const path = '/users/1.png';
-        final builder =
-            ImgixURLBuilder(domain: host, defaultSignKey: 'FOO123bar');
+        final builder = URLBuilder(domain: host, defaultSignKey: 'FOO123bar');
         expect(builder.createPlainURLString(path),
             'https://my-social-network.imgix.net/users/1.png?s=6797c24146142d5b40bde3141fd3600c');
       });
@@ -92,7 +132,7 @@ void main() {
       test('returns an Uri instance', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         final uri = builder.createURL(path);
         expect(uri.host, host);
         expect(uri.path, path);
@@ -104,7 +144,7 @@ void main() {
       test('returns an Uri instance', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
-        final builder = ImgixURLBuilder(domain: host, includeLibParam: true);
+        final builder = URLBuilder(domain: host, includeLibParam: true);
         final uri = builder.createURL(path);
         expect(uri.host, host);
         expect(uri.path, path);
@@ -117,7 +157,7 @@ void main() {
       test('returns a srcset', () {
         const host = 'my-host.imgix.net';
         const path = 'image.jpg';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         final srcset =
             builder.createSrcsetFromWidths(path, widths: [100, 200, 300, 400]);
         expect(
@@ -132,7 +172,7 @@ void main() {
       test('returns a srcset', () {
         const host = 'my-host.imgix.net';
         const path = 'image.jpg';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         final srcset = builder.buildSrcset(path,
             options:
                 SrcsetOption(minWidth: 100, maxWidth: 380, tolerance: 0.08));
@@ -154,7 +194,7 @@ void main() {
       test('returns a srcset', () {
         const host = 'my-host.imgix.net';
         const path = 'image.jpg';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         final srcset = builder.buildSrcset(path, params: {'w': '320'});
         expect(
             srcset,
@@ -169,7 +209,7 @@ void main() {
       test('returns a srcset', () {
         const host = 'my-host.imgix.net';
         const path = 'image.jpg';
-        final builder = ImgixURLBuilder(domain: host);
+        final builder = URLBuilder(domain: host);
         final srcset =
             builder.buildSrcset(path, params: {'h': '320', 'ar': '4:3'});
         expect(

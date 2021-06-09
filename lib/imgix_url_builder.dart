@@ -27,7 +27,8 @@ class ImgixURLBuilder {
     final isValidDomain = validators.validateDomain(_domain);
     if (!isValidDomain) {
       throw const FormatException(
-          'Domain must not be empty and must be passed in as fully-qualified domain name and should not include a protocol or any path element, i.e. "example.imgix.net".');
+          'Domain must not be empty and must be passed in as fully-qualified domain name '
+          'and should not include a protocol or any path element, i.e. "example.imgix.net".');
     }
   }
 
@@ -114,28 +115,31 @@ class ImgixURLBuilder {
       SrcsetOption options = const SrcsetOption.base()}) {
     if (_shouldBuildDPRBasedSrcset(params)) {
       return _buildSrcsetList(buildDPRBasedSrcsetEntries(path, params: params),
-          suffixBuilder: (e) => '${e.key}x').join('\n');
+          suffixBuilder: (e) => '${e.key}x').join(',\n');
     }
     final targets = options.generateTargetWidths();
     return _buildSrcsetList(
             buildSrcsetEntries(path, params: params, targets: targets))
-        .join('\n');
+        .join(',\n');
   }
 
-  // todo: add test
   String createSrcsetFromWidths(String path,
       {Map<String, String> params = const <String, String>{},
       required List<int> widths}) {
+    if (!validators.isValidWidths(widths)) {
+      throw const InvalidWidthsException(
+          message: 'Widths must not be empty and all width must be positive.');
+    }
     final entries = buildSrcsetEntries(path, params: params, targets: widths);
     return _buildSrcsetList(entries, suffixBuilder: (e) => '${e.key}w')
-        .join('\n');
+        .join(',\n');
   }
 
   Map<String, String> buildDPRBasedSrcsetEntries(String path,
       {Map<String, String> params = const <String, String>{}}) {
     return constants.DPR_QUALITIES.map<String, String>((key, value) {
-      params = _withDPRParams(params, key);
-      return MapEntry(key.toString(), createURLString(path, params: params));
+      final _params = _withDPRParams(params, key);
+      return MapEntry(key.toString(), createURLString(path, params: _params));
     });
   }
 
@@ -243,4 +247,10 @@ class ImgixURLBuilder {
       }
     };
   }
+}
+
+class InvalidWidthsException implements Exception {
+  const InvalidWidthsException({required this.message});
+
+  final String message;
 }

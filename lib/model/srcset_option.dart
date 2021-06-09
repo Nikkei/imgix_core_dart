@@ -39,7 +39,7 @@ class SrcsetOption {
       return 2 * (n / 2).round();
     }
 
-    while (prev < (maxWidth.toDouble())) {
+    while (prev.floor() <= (maxWidth.floor())) {
       resolutions.add(ensureEven(prev));
       prev *= 1 + (incrementPercentage * 2);
     }

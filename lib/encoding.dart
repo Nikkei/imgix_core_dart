@@ -54,3 +54,5 @@ String createSignature(String token, String path, String query) {
   final signature = md5.convert(utf8.encode(signatureBase)).toString();
   return signature;
 }
+
+// todo: add proxy functionality

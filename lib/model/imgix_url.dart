@@ -11,7 +11,9 @@ class ImgixURL {
     final isValidDomain = validators.validateDomain(domain);
     if (!isValidDomain) {
       throw const FormatException(
-          'Domain must be passed in as fully-qualified domain name and should not include a protocol or any path element, i.e. "example.imgix.net".');
+          'Domain must be passed in as fully-qualified domain name '
+          'and should not include a protocol or any path element, '
+          'i.e. "example.imgix.net".');
     }
     params = {
       if (params != null) ...params!,

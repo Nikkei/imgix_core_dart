@@ -33,12 +33,12 @@ void main() {
       });
     });
     group('if specified', () {
-      test('generates http url', () {
+      test('generates a http url', () {
         const host = 'my-host.imgix.net';
         final b = URLBuilder(domain: host, shouldUseHttpsByDefault: false);
         expect(b.createURLString('/path').startsWith('http://'), true);
       });
-      test('generates url with lib param', () {
+      test('generates an url with lib param', () {
         const host = 'my-host.imgix.net';
         final b = URLBuilder(domain: host, includeLibParam: true);
         expect(
@@ -46,6 +46,43 @@ void main() {
                 .createURLString('/path')
                 .contains('ixlib=dart-${constants.IMGIX_LIB_VERSION}'),
             true);
+      });
+      test('generates a signed url', () {
+        const host = 'my-host.imgix.net';
+        const sign = 'token';
+        final b = URLBuilder(domain: host, defaultSignKey: sign);
+        const path = '/path/to/image.jpg';
+        expect(
+            b.createURLString(path),
+            'https://my-host.imgix.net/path/to/image.jpg?s=f1569e4cf5a82e101be6401d4d9d5397'
+        );
+      });
+    });
+    group('createUrl',(){
+      test('returns a correct imgix URL',(){
+        const host = 'my-host.imgix.net';
+        const sign = 'token';
+        final b = URLBuilder(domain: host, defaultSignKey: sign);
+        const path = '/path/to/image.jpg';
+        const expectedSignature = 'f1569e4cf5a82e101be6401d4d9d5397';
+        final uri = b.createURL(path);
+        expect(uri.queryParameters['s'],expectedSignature);
+        expect(uri.host,host);
+        expect(uri.path,path);
+      });
+      test('returns a correct imgix URL even if path contains special characters',(){
+        const host = 'my-host.imgix.net';
+        const sign = 'token';
+        final b = URLBuilder(domain: host, defaultSignKey: sign);
+        const path = '/path/to/ <>[]{}|\\^%.jpg';
+        const expectedPath = '/path/to/%20%3C%3E%5B%5D%7B%7D%7C%5C%5E%25.jpg';
+        const expectedSignature = '6f6df3b7bca4968850009def43c1a4e7';
+        final uri = b.createURL(path);
+        final string = b.createURLString(path);
+        expect(uri.queryParameters['s'],expectedSignature);
+        expect(uri.host,host);
+        expect(uri.path,expectedPath);
+        expect('https://'+ uri.host + uri.path + '?s=' + uri.queryParameters['s']!,string);
       });
     });
     group('.createUrlString(<valid path)', () {

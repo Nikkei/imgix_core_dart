@@ -66,7 +66,7 @@ class URLBuilder {
     _shouldIncludeLibParamByDefault = useLibParam;
   }
 
-  // todo: check that a signature will not change after being parsed.
+  /// create an [Uri] instance which wraps Imgix URL String.
   Uri createURL(String path) {
     return Uri.parse(createPlainURLString(path));
   }
@@ -75,11 +75,12 @@ class URLBuilder {
   ///
   /// i.e. `createPlainURLString(/foo/bar/buzz)` returns 'https://example.com/foo/bar/buzz'
   ///
-  /// Generated url may contain `ixlib`(library version) and `s`(signature) parameters.
+  /// Generated url may contain `ixlib`(library version) and `s`(signature) parameters if specified in builder's constructor.
   String createPlainURLString(String path) {
     return createURLString(path);
   }
 
+  /// wip
   List<String> createURLStrings(Iterable<String> paths,
       {Map<String, String>? sharedParams,
       bool? useHttps,
@@ -87,7 +88,7 @@ class URLBuilder {
     return [];
   }
 
-  /// [createURLString] generates imgix url with optional query parameters
+  /// [createURLString] generates imgix url with optional query parameters.
   /// - If [useHttps] is given, default setting([shouldUseHttpsByDefault]) is overridden.
   /// - If [includeLibraryParams] is given, default setting([_shouldIncludeLibParamByDefault]) is overridden.
   String createURLString(String path,

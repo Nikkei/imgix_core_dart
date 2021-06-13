@@ -2,7 +2,7 @@ import 'package:imgix_core_dart/encoding.dart';
 import 'package:meta/meta.dart';
 import 'package:imgix_core_dart/constants.dart' as constants;
 import 'package:imgix_core_dart/validators.dart' as validators;
-
+/// wip
 class ImgixURL {
   ImgixURL(String path, this.domain,
       {this.params, bool useHttps = true, this.includeLibParam = false})

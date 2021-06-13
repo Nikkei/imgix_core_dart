@@ -36,17 +36,17 @@ void main() {
 To produce a signed URL, you must enable secure URLs on your source and then provide your signature key to the URL builder.
 
 ```dart
-final urlBuilder =  new ImgixURLBuilder('demos.imgix.net',signKey: '***********');
+final urlBuilder =  new URLBuilder('demos.imgix.net',signKey: '***********');
 
 // or
-final urlBuilder = new ImgixUrlBuilder('demos.imgix.net')
+final urlBuilder = new URLBuilder('demos.imgix.net')
     ..setDefaultSignKey('**********');
 ```
 
 ## Srcset Generation
 
 ```dart
-final urlBuilder =  new ImgixURLBuilder('demos.imgix.net');
+final urlBuilder =  new URLBuilder('demos.imgix.net');
 final srcsetString = urlBuilder.createSrcsetString('example.png');
 final srcset = urlBuilder.createSrcset('example.png');
 ```
@@ -54,7 +54,7 @@ final srcset = urlBuilder.createSrcset('example.png');
 ## Running Tests
 
 ```shell script
-pub test
+pub run test
 ```
 
-## Contributing
+## Contribution

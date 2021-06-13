@@ -32,6 +32,10 @@ class URLBuilder {
     }
   }
 
+  bool get isHttps => _shouldIncludeLibParamByDefault;
+
+  bool get isSigned => _signKey != null && _signKey!.isNotEmpty;
+
   /// A source's domain, i.e. example.imgix.net
   final String _domain;
 
@@ -78,14 +82,6 @@ class URLBuilder {
   /// Generated url may contain `ixlib`(library version) and `s`(signature) parameters if specified in builder's constructor.
   String createPlainURLString(String path) {
     return createURLString(path);
-  }
-
-  /// wip
-  List<String> createURLStrings(Iterable<String> paths,
-      {Map<String, String>? sharedParams,
-      bool? useHttps,
-      bool? includeLibraryParams}) {
-    return [];
   }
 
   /// [createURLString] generates imgix url with optional query parameters.
@@ -135,6 +131,7 @@ class URLBuilder {
         .join(',\n');
   }
 
+  /// [buildSrcsetEntries] returns srcset urls paired with quality as Map<int,String>. Key is quality("1"～"5") and value is path.
   Map<String, String> buildDPRBasedSrcsetEntries(String path,
       {Map<String, String> params = const <String, String>{}}) {
     return constants.DPR_QUALITIES.map<String, String>((key, value) {
@@ -175,16 +172,14 @@ class URLBuilder {
 
   /// [buildParams] uri-encodes query parameter keys and values, and then concatenates them into String with delimiter '&'.
   String buildParams(Map<String, String> params) {
-    final queryParams = <String>[];
-
-    for (final key in params.keys) {
-      final val = params[key]!;
-      final encodedKey = key.inUriEncodeComponent;
-      final encodedVal =
-          key.isBase64 ? val.inBase64Encoding : val.inUriEncodeComponent;
-      queryParams.add('$encodedKey=$encodedVal');
-    }
-    return queryParams.join('&');
+    return params.entries.fold<List<String>>([], (acc, entry) {
+      final encodedKey = entry.key.inUriEncodeComponent;
+      final encodedValue = entry.key.isBase64
+          ? entry.value.inBase64Encoding
+          : entry.value.inUriEncodeComponent;
+      acc.add('$encodedKey=$encodedValue');
+      return acc;
+    }).join('&');
   }
 
   Map<String, String> _joinWithMetaParams(Map<String, String> queryParams,
@@ -198,18 +193,12 @@ class URLBuilder {
 
   /// [_scheme] gets the URL scheme to use, either "http" or "https"
   /// (the scheme uses HTTPS by default).
-  String _scheme() {
-    if (_useHttpsByDefault) {
-      return 'https';
-    } else {
-      return 'http';
-    }
-  }
+  String get _scheme => _useHttpsByDefault ? 'https' : 'http';
 
   /// [_urlPrefix] gets the URL prefix to use, either "http://" or "https://"
   /// (the scheme uses HTTPS by default).
   String _urlPrefix() {
-    return _scheme() + '://';
+    return _scheme + '://';
   }
 
   /// [_shouldBuildDPRBasedSrcset] determines if we can infer from params whether we need
@@ -218,8 +207,7 @@ class URLBuilder {
   /// then we can infer the desired srcset is dpr-based.
   bool _shouldBuildDPRBasedSrcset(Map<String, String> params) {
     return (params['w']?.isNotEmpty ?? false) ||
-        ((params['h']?.isNotEmpty ?? false) &
-            (params['ar']?.isNotEmpty ?? false));
+        (params['h']?.isNotEmpty ?? false);
   }
 
   @visibleForTesting

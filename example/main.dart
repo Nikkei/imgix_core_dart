@@ -1,15 +1,15 @@
-import 'package:imgix_core_dart/imgix_core_dart.dart';
+import 'package:imgix_core_dart/url_builder.dart';
 
 void main() {
-  final client = ImgixClient(
+  final client = URLBuilder(
     domain: 'testing.imgix.net',
-    useHTTPS: true,
-    secureURLToken: '<SECURE TOKEN>',
+    shouldUseHttpsByDefault: true,
+    defaultSignKey: '<SECURE TOKEN>',
   );
 
-  final url = client.buildURL(
+  final url = client.createURLString(
     '/path/to/image.png',
-    <String, dynamic>{'w': 400, 'h': 300},
+    params: {'w': '400', 'h': '300'},
   );
   print(url);
 }

@@ -2,7 +2,9 @@
 
 Imgix package for Dart. Imgix is a CDN service with support for realtime image processing and optimization.
 
-See also https://docs.imgix.com/apis
+See also
+- https://docs.imgix.com
+- https://github.com/imgix/imgix-blueprint
 
 ## Install
 
@@ -16,17 +18,43 @@ dependencies:
 import 'package:imgix_core_dart/imgix_core_dart.dart';
 
 void main() {
-  final client = ImgixClient(
+  final client = URLBuilder(
     domain: 'testing.imgix.net',
-    useHTTPS: true,
-    secureURLToken: '<SECURE TOKEN>',
+    shouldUseHttpsByDefault: true,
+    defaultSignKey: '<SECURE TOKEN>',
   );
 
-  final url = client.buildURL(
+  final url = client.createURLString(
     '/path/to/image.png',
-    <String, dynamic>{'w': 400, 'h': 300},
+    params: {'w': '400', 'h': '300'},
   );
-  print(url);
-  // -> http://testing.imgix.net/path/to/image.png?ixlib=dart-1.0.0&s=d989ab7de53535886b09183a43f801aa
+  print(url); // => https://testing.imgix.net/path/to/image.png?w=400&h=300&s=11c92d85ea7e2d7ddfb98e5aac179964
 }
 ```
+
+## signed urls
+To produce a signed URL, you must enable secure URLs on your source and then provide your signature key to the URL builder.
+
+```dart
+final urlBuilder =  new URLBuilder('demos.imgix.net',signKey: '***********');
+
+// or
+final urlBuilder = new URLBuilder('demos.imgix.net')
+    ..setDefaultSignKey('**********');
+```
+
+## Srcset Generation
+
+```dart
+final urlBuilder =  new URLBuilder('demos.imgix.net');
+final srcsetString = urlBuilder.createSrcsetString('example.png');
+final srcset = urlBuilder.createSrcset('example.png');
+```
+
+## Running Tests
+
+```shell script
+pub run test
+```
+
+## Contribution

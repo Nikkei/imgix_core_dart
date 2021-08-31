@@ -56,5 +56,3 @@ final srcset = urlBuilder.createSrcset('example.png');
 ```shell script
 pub run test
 ```
-
-## Contribution

@@ -1,7 +1,7 @@
 # CHANGELOG
 
-## [1.0.0-nullsafety.0] 2021-06-xx
-First Release!
+## [1.0.0-nullsafety.0] 2021-08-31
+First Release.
 
 ### features
 

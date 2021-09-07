@@ -10,7 +10,7 @@ See also
 
 ```pubspec.yaml
 dependencies:
-     imgix_core_dart: 1.0.0-nullsafety.0
+     imgix_core_dart: 1.0.0
 ```
 ## Usage
 

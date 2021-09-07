@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## [1.0.0-nullsafety.0] 2021-08-31
-First Release.
+1st Release from Nikkei.
 
 ### features
 

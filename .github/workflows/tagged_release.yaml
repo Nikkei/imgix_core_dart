@@ -1,4 +1,4 @@
-name: Create a release PR
+name: Release
 # create release tag from PR named release/vx.x.x` on merge to release branch
 # and then publish package.
 on:

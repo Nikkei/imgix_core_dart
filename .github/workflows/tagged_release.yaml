@@ -1,0 +1,39 @@
+name: Create a release PR
+# create release tag from PR named release/vx.x.x` on merge to release branch
+# and then publish package.
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - release
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: create release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.event.pull_request.title }}
+          body: ${{ github.event.pull_request.body }}
+          allowUpdates: true
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - create-release
+    container:
+      image:  google/dart:latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: install libssl-dev
+        run: sudo apt install libssl-dev
+      - name: decode credentials.json
+        run: |
+          mkdir -p ~/.pub-cache
+          echo "${{ secrets.PUB_CREDENTIALS_BASE64 }}" | openssl enc -d -base64 > ~/.pub-cache/credentials.json
+      - name: publish
+        run: pub publish -f

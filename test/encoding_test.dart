@@ -1,8 +1,7 @@
 import 'dart:convert';
 
-import 'package:test/test.dart';
-
 import 'package:imgix_core_dart/encoding.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('encoding', () {

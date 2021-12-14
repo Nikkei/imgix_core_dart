@@ -1,8 +1,9 @@
 library imgix_core_dart;
 
 import 'dart:core';
-import 'package:imgix_core_dart/encoding.dart';
+
 import 'package:imgix_core_dart/constants.dart' as constants;
+import 'package:imgix_core_dart/encoding.dart';
 import 'package:imgix_core_dart/model/srcset_option.dart';
 import 'package:imgix_core_dart/validators.dart' as validators;
 import 'package:meta/meta.dart';

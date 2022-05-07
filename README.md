@@ -1,4 +1,7 @@
 # imgix_core_dart
+[![test](https://github.com/Nikkei/imgix_core_dart/actions/workflows/ci.yaml/badge.svg)](https://github.com/Nikkei/imgix_core_dart/actions/workflows/ci.yaml)
+[![Release](https://github.com/Nikkei/imgix_core_dart/actions/workflows/tagged_release.yaml/badge.svg)](https://github.com/Nikkei/imgix_core_dart/actions/workflows/tagged_release.yaml)
+
 
 Imgix package for Dart. Imgix is a CDN service with support for realtime image processing and optimization.
 
@@ -10,7 +13,7 @@ See also
 
 ```pubspec.yaml
 dependencies:
-     imgix_core_dart: 1.0.0
+     imgix_core_dart: ^1.0.0
 ```
 ## Usage
 

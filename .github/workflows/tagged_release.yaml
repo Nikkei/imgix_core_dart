@@ -13,7 +13,7 @@ jobs:
     if: github.event.pull_request.merged == true
     steps:
       - name: create release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af # v1.18.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.event.pull_request.title }}

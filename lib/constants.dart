@@ -56,6 +56,6 @@ const DPR_QUALITIES = <int, int>{1: 75, 2: 50, 3: 35, 4: 23, 5: 20};
 const DOMAIN_REGEX =
     r'^(?:[a-z\d\-_]{1,62}\.){0,125}(?:[a-z\d](?:\-(?=\-*[a-z\d])|[a-z]|\d){0,62}\.)[a-z\d]{1,63}$';
 
-const IMGIX_LIB_VERSION = '0.0.0';
+const IMGIX_LIB_VERSION = '1.0.0+3';
 
 const metaParams = <String, String>{'ixlib': 'dart-$IMGIX_LIB_VERSION'};

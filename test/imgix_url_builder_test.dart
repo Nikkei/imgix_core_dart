@@ -1,4 +1,5 @@
 import 'package:imgix_core_dart/constants.dart' as constants;
+import 'package:imgix_core_dart/encoding.dart';
 import 'package:imgix_core_dart/model/srcset_option.dart';
 import 'package:imgix_core_dart/url_builder.dart';
 import 'package:test/test.dart';
@@ -38,13 +39,13 @@ void main() {
         final b = URLBuilder(domain: host, shouldUseHttpsByDefault: false);
         expect(b.createURLString('/path').startsWith('http://'), true);
       });
-      test('generates an url with lib param', () {
+      test('generates an url with lib param being encoded as url safe string',
+          () {
         const host = 'my-host.imgix.net';
         final b = URLBuilder(domain: host, includeLibParam: true);
         expect(
-            b
-                .createURLString('/path')
-                .contains('ixlib=dart-${constants.IMGIX_LIB_VERSION}'),
+            b.createURLString('/path').contains(
+                'ixlib=dart-${constants.IMGIX_LIB_VERSION.inUriEncodeComponent}'),
             true);
       });
       test('generates a signed url', () {
@@ -91,7 +92,7 @@ void main() {
             string);
       });
     });
-    group('.createUrlString(<valid path)', () {
+    group('.createUrlString(<valid path>)', () {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
         const path = 'foo/bar/buzz';
@@ -102,7 +103,7 @@ void main() {
             builder.createPlainURLString(pathWithSlash));
       });
     });
-    group('.createUrlString(<path starts with /)', () {
+    group('.createUrlString(<path starts with `/`>)', () {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
@@ -111,7 +112,7 @@ void main() {
       });
     });
     group(
-        '.createUrlString(<path with non empty string containing special characters)',
+        '.createUrlString(<path with non empty string containing special characters>)',
         () {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
@@ -123,7 +124,7 @@ void main() {
         expect(result, 'https://$host/%23foo/%3Abar/%3Fbuzz/');
       });
     });
-    group('.createUrlString(<path with special characters)', () {
+    group('.createUrlString(<path with special characters>)', () {
       test('returns correct imgix URL', () {
         const host = 'my-host.imgix.net';
         const path = '#/:/?/';
@@ -134,16 +135,16 @@ void main() {
         expect(result, 'https://$host/%23/%3A/%3F/');
       });
     });
-    group('.createUrlString(<valid path) with lib param', () {
+    group('.createUrlString(<valid path>) with lib param', () {
       test('returns an Uri instance', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
         final builder = URLBuilder(domain: host, includeLibParam: true);
         expect(builder.createPlainURLString(path),
-            'https://$host$path?ixlib=dart-${constants.IMGIX_LIB_VERSION}');
+            'https://$host$path?ixlib=dart-${constants.IMGIX_LIB_VERSION.inUriEncodeComponent}');
       });
     });
-    group('.createUrlString(<valid path) with plain params', () {
+    group('.createUrlString(<valid path>) with plain params', () {
       test('returns an Uri instance', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
@@ -153,7 +154,7 @@ void main() {
             'https://$host$path?h=300&w%24=%24400');
       });
     });
-    group('.createUrlString(<valid path) with base64 params', () {
+    group('.createUrlString(<valid path>) with base64 params', () {
       test('returns an Uri instance', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
@@ -162,7 +163,16 @@ void main() {
             'https://$host$path?txt64=bG9yZW0gaXBzdW0');
       });
     });
-    group('.createUrlString(<valid path) with signKey', () {
+    group('.createUrlString(<valid path>) with empty key or value', () {
+      test('returns an Uri instance with empty one being as is', () {
+        const host = 'my-host.imgix.net';
+        const path = '/foo/bar/buzz';
+        final builder = URLBuilder(domain: host);
+        expect(builder.createURLString(path, params: {'': 'value', 'key': ''}),
+            'https://$host$path?=value&key=');
+      });
+    });
+    group('.createUrlString(<valid path>) with signKey', () {
       test('returns an Uri instance', () {
         const host = 'my-social-network.imgix.net';
         const path = '/users/1.png';
@@ -171,7 +181,7 @@ void main() {
             'https://my-social-network.imgix.net/users/1.png?s=6797c24146142d5b40bde3141fd3600c');
       });
     });
-    group('.createUrl(<valid path)', () {
+    group('.createUrl(<valid path>)', () {
       test('returns an Uri instance', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
@@ -184,7 +194,7 @@ void main() {
       });
     });
     group('.createUrl(<valid path>) with lib param', () {
-      test('returns an Uri instance', () {
+      test('returns an Uri instance with lib param being as is', () {
         const host = 'my-host.imgix.net';
         const path = '/foo/bar/buzz';
         final builder = URLBuilder(domain: host, includeLibParam: true);
@@ -192,6 +202,7 @@ void main() {
         expect(uri.host, host);
         expect(uri.path, path);
         expect(uri.scheme, 'https');
+        // hold value in url unsafe format
         expect(uri.queryParameters,
             <String, String>{'ixlib': 'dart-${constants.IMGIX_LIB_VERSION}'});
       });

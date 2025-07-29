@@ -1,6 +1,6 @@
 name: imgix_core_dart
 description: Imgix package for Dart.
-version: 1.0.0+1
+version: 1.0.0+3
 homepage: https://github.com/Nikkei/imgix_core_dart
 
 environment:
